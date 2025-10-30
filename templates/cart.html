@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #edf6f9;
+            color: #e62429;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Container and Layout */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            color: #e62429;
+        }
+
+        .cart-layout {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Cart Items Section */
+        .cart-items {
+            flex: 3;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            overflow-y: auto; /* Enable scrolling if needed */
+            max-height: 400px; /* Set a max height */
+        }
+
+        .cart-items ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .cart-items li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #333;
+            padding: 10px 0;
+        }
+
+        .cart-items img {
+            width: 60px; /* Adjusted size for better visibility */
+            height: auto;
+            margin-right: 10px;
+            border-radius: 5px; /* Rounded corners for images */
+        }
+
+        .cart-item-info {
+            flex-grow: 1;
+            margin-right: 15px; /* Space between info and action buttons */
+        }
+
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-item-actions button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #e62429;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .cart-item-actions button:hover {
+            background-color: #d62027; /* Darker shade on hover */
+        }
+
+        /* Summary Section */
+        .summary {
+            flex: 1;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+        }
+
+        .summary h2 {
+            color: #e62429;
+            margin-bottom: 20px;
+        }
+
+        .summary p {
+            margin: 10px 0;
+        }
+
+        .summary button {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e62429;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .summary button:hover {
+            background-color: #d62027;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #222;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%; /* Responsive width */
+            max-width: 400px; /* Max width for larger screens */
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            color: #e62429;
+        }
+
+        .modal-content button,
+        .modal-content select,
+        .modal-content input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #444;
+        }
+
+        .modal-content button {
+            background: #e62429;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .modal-content button:hover {
+            background: #d62027;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Shopping Cart</h1>
+        <div class="cart-layout">
+            <!-- Cart Items -->
+            <div class="cart-items">
+                {% if cart_items %}
+                <ul id="cartList">
+                    {% for item in cart_items %}
+                    <li id="item-{{ item.product_id }}">
+                        <img src="{{ item.image_url }}" alt="{{ item.product_name }}">
+                        <div class="cart-item-info">
+                            <strong>{{ item.product_name }}</strong>
+                            <p>Price: ${{ "%.2f"|format(item.price) }}</p>
+                            <p>Quantity:
+                                <button onclick="updateQuantity({{ item.product_id }}, -1)">-</button>
+                                <span>{{ item.quantity }}</span>
+                                <button onclick="updateQuantity({{ item.product_id }}, 1)">+</button>
+                            </p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button onclick="removeItem({{ item.product_id }})">Remove</button>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>Your cart is empty.</p>
+                {% endif %}
+            </div>
+            <!-- Order Summary -->
+            <div class="summary">
+                <h2>Order Summary</h2>
+                <p>Subtotal: ₱ <span id="subtotal">{{ subtotal }}</span></p>
+                <button onclick="openCheckout()">Proceed to Checkout</button>
+                <button onclick="goToMenu()">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Method Modal -->
+    <div id="payment-modal" class="modal">
+        <div class="modal-content">
+            <h2>Select Payment Method</h2>
+            <select id="payment-method" onchange="showPaymentOptions()">
+                <option value="">Choose Payment Method</option>
+                <option value="Cash on Delivery">Cash on Delivery</option>
+                <option value="E-Wallet">E-Wallet</option>
+                <option value="Card">Card</option>
+            </select>
+            <button onclick="nextStep()">Next</button>
+            <button onclick="closeModal('payment-modal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- E-Wallet Modal -->
+    <div id="e-wallet-modal" class="modal">
+        <div class="modal-content">
+            <h2>Select E-Wallet Provider</h2>
+            <select id="e-wallet-provider" onchange="showWalletInfo()">
+                <option value="">Choose Provider</option>
+                <option value="GCASH">GCASH</option>
+                <option value="MAYA">MAYA</option>
+            </select>
+            <div id="wallet-info"></div>
+            <button onclick="proceedWithEWallet()">Proceed to Shipping</button>
+            <button onclick="closeModal('e-wallet-modal')">Back</button>
+        </div>
+    </div>
+
+    <!-- Card Modal -->
+    <div id="card-modal" class="modal">
+        <div class="modal-content">
+            <h2>Enter Card Details</h2>
+            <input type="text" id="card-number" placeholder="Card Number" required>
+            <input type="text" id="card-holder-name" placeholder="Card Holder Name" required>
+            <input type="text" id="expiration-date" placeholder="Expiration Date (MM/YY)" required>
+            <input type="text" id="cvv" placeholder="CVV" required>
+            <button onclick="submitCardDetails()">Submit Card Details</button>
+            <button onclick="closeModal('card-modal')">Back</button>
+        </div>
+    </div>
+
+    <!-- Shipping Information Modal -->
+    <div id="shipping-modal" class="modal">
+        <div class="modal-content">
+            <h2>Enter Shipping Information</h2>
+            <input type="text" id="full-name" placeholder="Full Name" required>
+            <input type="text" id="address-line1" placeholder="Address Line 1" required>
+            <input type="text" id="address-line2" placeholder="Address Line 2 (optional)">
+            <input type="text" id="city" placeholder="City" required>
+            <input type="text" id="province" placeholder="Province (optional)">
+            <input type="text" id="postal-code" placeholder="Postal Code" required>
+            <input type="text" id="phone-number" placeholder="Phone Number" required>
+            <button onclick="submitShippingInfo()">Submit Shipping Info</button>
+            <button onclick="closeModal('shipping-modal')">Back</button>
+        </div>
+    </div>
+
+    <script>
+        function openCheckout() {
+            document.getElementById('payment-modal').style.display = 'flex';
+        }
+
+        function updateQuantity(productId, change) {
+            const itemElement = document.getElementById(`item-${productId}`);
+            const quantityElement = itemElement.querySelector('span');
+            let currentQuantity = parseInt(quantityElement.textContent);
+            if (change === -1 && currentQuantity > 1) {
+                currentQuantity--;
+            } else if (change === 1) {
+                currentQuantity++;
+            }
+
+            fetch('/updatecart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: currentQuantity
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Cart updated successfully') {
+                    quantityElement.textContent = currentQuantity;
+                    document.getElementById('subtotal').textContent = data.new_subtotal;
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error updating cart:', error));
+        }
+
+        function removeItem(productId) {
+            fetch('/updatecart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: 0
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Cart updated successfully') {
+                    const itemElement = document.getElementById(`item-${productId}`);
+                    itemElement.remove();
+                    document.getElementById('subtotal').textContent = data.new_subtotal;
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error removing item:', error));
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showPaymentOptions() {
+            const method = document.getElementById('payment-method').value;
+            closeModal('payment-modal'); // Close the payment modal
+
+            if (method === 'E-Wallet') {
+                document.getElementById('e-wallet-modal').style.display = 'flex'; // Show the E-Wallet modal
+            } else if (method === 'Card') {
+                document.getElementById('card-modal').style.display = 'flex'; // Show the Card modal
+            } else if (method === 'Cash on Delivery') {
+                document.getElementById('shipping-modal').style.display = 'flex'; // Direct to shipping
+            }
+        }
+
+        function nextStep() {
+            const method = document.getElementById('payment-method').value;
+            if (method) {
+                showPaymentOptions();
+            } else {
+                alert('Please select a payment method.');
+            }
+        }
+
+        function showWalletInfo() {
+            const eWalletProvider = document.getElementById('e-wallet-provider').value;
+            const walletInfo = {
+                'GCASH': 'Name: Master Airos\nNumber: 09123456789',
+                'MAYA': 'Name: Master Airos\nNumber: 09987654321'
+            };
+            if (eWalletProvider) {
+                document.getElementById('wallet-info').innerText = walletInfo[eWalletProvider];
+            } else {
+                document.getElementById('wallet-info').innerText = '';
+            }
+        }
+
+        function proceedWithEWallet() {
+            const provider = document.getElementById('e-wallet-provider').value;
+
+            if (!provider) {
+                alert('Please select an E-Wallet provider.');
+                return;
+            }
+
+            // Make AJAX call to process payment
+            fetch('/process_payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    payment_method: 'E-Wallet',
+                    e_wallet_provider: provider,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Payment recorded successfully.') {
+                    alert('Payment recorded successfully!'); // Notify success
+                    closeModal('e-wallet-modal'); // Close the E-Wallet modal
+                    document.getElementById('shipping-modal').style.display = 'flex'; // Show shipping modal
+                } else {
+                    alert(data.message); // Inform user of any potential issues
+                }
+            })
+            .catch(error => {
+                console.error('Error processing payment:', error); // Log any errors
+                alert('An error occurred while processing your payment. Please try again.');
+            });
+        }
+
+        function submitShippingInfo() {
+            const shippingInfo = {
+                full_name: document.getElementById('full-name').value.trim(),
+                address_line1: document.getElementById('address-line1').value.trim(),
+                address_line2: document.getElementById('address-line2').value.trim() || null,
+                city: document.getElementById('city').value.trim(),
+                province: document.getElementById('province').value.trim() || null,
+                postal_code: document.getElementById('postal-code').value.trim(),
+                phone_number: document.getElementById('phone-number').value.trim(),
+            };
+
+            if (!shippingInfo.full_name || !shippingInfo.address_line1 || !shippingInfo.city || !shippingInfo.postal_code || !shippingInfo.phone_number) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            fetch('/add_shipping_info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(shippingInfo),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Order completed successfully!') {
+                    alert('Order completed successfully!');
+                    window.location.href = '/orders'; // Redirect to orders page
+                } else {
+                    alert('Error submitting shipping information: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while submitting the shipping information.');
+            });
+        }
+
+        function submitCardDetails() {
+            const cardDetails = {
+                card_number: document.getElementById('card-number').value,
+                card_holder_name: document.getElementById('card-holder-name').value,
+                expiration_date: document.getElementById('expiration-date').value,
+                cvv: document.getElementById('cvv').value,
+            };
+
+            fetch('/add_card_details', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(cardDetails),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Card details submitted successfully!') {
+                    alert('Card details submitted successfully!');
+                    closeModal('card-modal');
+                    document.getElementById('shipping-modal').style.display = 'flex'; // Proceed to shipping
+                } else {
+                    alert('Error submitting card details: ' + data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function goToMenu() {
+            window.location.href = "/menu"; // Adjust URL as needed
+        }
+    </script>
+</body>
+</html>

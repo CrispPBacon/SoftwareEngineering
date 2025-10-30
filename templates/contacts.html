@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #edf6f9;
+            color: #ffffff;
+            padding-top: 80px; /* Adjusted for fixed header */
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            z-index: 99;
+            background: #000; /* Black background for header */
+        }
+
+        header img {
+            height: 60px;
+            filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(93deg) brightness(105%) contrast(104%);
+        }
+
+        .navigation {
+            margin-left: auto;
+            display: flex;
+            gap: 15px;
+        }
+
+        .navigation a, .navigation button {
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 15px;
+            color: #ff0000; /* Bright red text color */
+        }
+
+        .navigation button {
+            width: 120px;
+            height: 50px;
+            background: transparent;
+            border: 2px solid #ff0000; /* Bright red border color */
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1em;
+            color: #ff0000; /* Bright red text color */
+        }
+
+        .navigation button:hover, .navigation a:hover {
+            color: #fff;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #87CEEB;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .content h2 {
+            margin-bottom: 20px;
+            color: #000;
+        }
+
+        .social-media-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .social-media-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .social-media-list a {
+            color: #1a0dab;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .social-media-list a:hover {
+            text-decoration: underline;
+        }
+
+        .social-media-list img {
+            width: 32px;
+            height: 32px;
+            margin-right: 10px;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-left: 20px;
+            padding: 10px 20px;
+            text-align: center;
+            color: black;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 2em;
+            transition: color 0.3s;
+        }
+        .back-button:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://logos-world.net/wp-content/uploads/2020/07/Asus-Logo.png" alt="Logo">
+        <a href="{{ url_for('main.menu') }}" class="back-button">&#8592;</a>
+        <nav class="navigation">
+            <a href="{{ url_for('main.menu') }}">Home</a>
+            <a href={{ url_for('user.profile') }}>Profile</a>
+            <a href="{{ url_for('main.get_cart') }}">Cart</a>
+            <a href="{{ url_for('main.products') }}">Products</a>
+            <a href="{{ url_for('main.orders') }}">My Orders</a>
+            <a href="{{ url_for('main.faq') }}">FAQ's</a>
+            <a href="{{ url_for('main.contact') }}">Contacts</a>
+            <form action="{{ url_for('user.logout') }}" method="post">
+                <button type="submit">Sign Out</button>
+            </form>
+        </nav>
+    </header>
+    <main class="content">
+        <h2>Contact Us</h2>
+        <p style="color: black;">Follow Asus on social media for the latest updates and support:</p>
+        <ul class="social-media-list">
+            <li><a href="https://www.asus.com/" target="_blank"><img src="https://w7.pngwing.com/pngs/962/518/png-transparent-asus-rog-hd-logo-thumbnail.png" alt="ROG Logo"> Asus Website</a></li>
+            <li><a href="https://www.facebook.com/ASUS" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Logo"> Facebook</a></li>
+            <li><a href="https://twitter.com/ASUS" target="_blank"><img src="https://cdn.punchng.com/wp-content/uploads/2023/07/24084806/Twitter-new-logo.jpeg" alt="X Logo"> X (formerly Twitter)</a></li>
+            <li><a href="https://www.instagram.com/asus/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram Logo"> Instagram</a></li>
+            <li><a href="https://www.youtube.com/user/ASUS" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube Logo"> YouTube</a></li>
+            <li><a href="https://www.reddit.com/r/ASUS/" target="_blank"><img src="https://shop.tti.com.ph/pub/media/rokanthemes/brand/TUFF.jpg" alt="TUF Logo"> Reddit</a></li>
+            <li><a href="https://www.tiktok.com/@asus" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg" alt="TikTok Logo"> TikTok</a></li>
+        </ul>
+    </main>
+</body>
+</html>

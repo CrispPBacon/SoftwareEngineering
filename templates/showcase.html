@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showcase</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0e0e0e;
+            color: #ff0000;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #1c1c1c;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            color: #ff0000;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="url"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ff0000;
+            border-radius: 5px;
+            background-color: #0e0e0e;
+            color: #ff0000;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #ff0000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #fff;
+            font-size: 1em;
+        }
+
+        button:hover {
+            background-color: #ff3333;
+        }
+
+        .image-grid {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .image-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #262626;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            border: 2px solid #ff0000;
+        }
+
+        .remove-button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #ff0000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #fff;
+        }
+
+        .remove-button:hover {
+            background-color: #ff3333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/menu" style="color: #ff0000; text-decoration: none; font-weight: bold;">Back to Menu</a>
+    </header>
+    <div class="container">
+        <h2>Manage Showcase Images</h2>
+        <form id="imageForm" onsubmit="addImage(event)">
+            <input type="url" name="image_url" placeholder="Enter Image URL" required>
+            <div class="button-group">
+                <button type="submit">Add Image</button>
+                <button type="button" onclick="saveImages()">Save</button>
+            </div>
+        </form>
+
+        <!-- Image Grid -->
+        <div class="image-grid" id="imageGrid">
+            {% for image in images %}
+                <div class="image-item" id="image-{{ image.id }}">
+                    <img src="{{ image.image_url }}" alt="Showcase Image">
+                    <button class="remove-button" onclick="removeImage('{{ image.image_url }}', this)">Remove</button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        let newImageLinks = []; // Temporarily store new images
+
+        function addImage(event) {
+            event.preventDefault();
+            const imageUrl = document.querySelector('input[name="image_url"]').value.trim();
+            if (imageUrl) {
+                newImageLinks.push(imageUrl);
+
+                const grid = document.getElementById('imageGrid');
+                const newImageDiv = document.createElement('div');
+                newImageDiv.classList.add('image-item');
+                newImageDiv.innerHTML = `
+                    <img src="${imageUrl}" alt="Showcase Image">
+                `;
+                grid.appendChild(newImageDiv);
+
+                document.querySelector('input[name="image_url"]').value = '';
+            }
+        }
+
+        function removeImage(imageUrl, buttonElement) {
+            if (confirm("Are you sure you want to remove this image?")) {
+                fetch('/remove_image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image_url: imageUrl }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        buttonElement.parentElement.remove();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+
+        function saveImages() {
+            if (newImageLinks.length > 0) {
+                fetch('/showcase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageLinks: newImageLinks }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        location.reload();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+                alert('No new images to save.');
+            }
+        }
+    </script>
+</body>
+</html>

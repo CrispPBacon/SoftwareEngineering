@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-image: url("https://dlcdnrog.asus.com/rog/media/1513882457293.webp");
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #ff0000;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        label {
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ff0000;
+            border-radius: 5px;
+            background-color: #ffffff;
+            color: #000;
+            margin-bottom: 15px;
+        }
+
+        input::placeholder, select {
+            color: #000;
+            opacity: 0.8;
+        }
+
+        button {
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background-color: darkred;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #ff0000;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #ff0000;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .flashes {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .flashes li {
+            color: red;
+            font-size: 14px;
+        }
+
+        .flashes li.success {
+            color: green;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 22px;
+            }
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Register</h2>
+    <div class="container">
+        <form method="post" action="/register">
+            <div>
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" required>
+            </div>
+
+            <div>
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" placeholder="Enter your last name" required>
+            </div>
+
+            <div>
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender" required>
+                    <option value="" disabled selected>Select your gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="LGBT+">LGBT+</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+
+            <div>
+                <label for="number">Phone Number:</label>
+                <input type="text" id="number" name="number" placeholder="Enter your phone number" required>
+            </div>
+
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="Choose a username" required>
+            </div>
+
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Create a password" required>
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <div class="login-link">
+            <p>Already have an account? <a href="/login">Login</a></p>
+        </div>
+    </div>
+
+    <!-- Flask flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Users Panel</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        width: 90%;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .back-btn {
+        background-color: #f39c12;
+        color: white;
+        text-decoration: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        display: inline-block;
+        margin-bottom: 20px;
+        margin-right: 20px;
+      }
+
+      .back-btn:hover {
+        background-color: #e67e22;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+
+      th {
+        background-color: #007BFF;
+        color: white;
+      }
+
+      td {
+        background-color: #f4f4f4;
+      }
+
+      .notification {
+        display: none;
+        position: relative;
+        margin-top: 20px;
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      .notification.show {
+        display: block;
+      }
+
+      .notification.error {
+        background-color: #f44336;
+      }
+
+      button {
+        padding: 10px 15px;
+        margin: 5px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .ban-btn {
+        background-color: #f44336;
+      }
+
+      .ban-btn:hover {
+        background-color: #e60000;
+      }
+
+      .timeout-btn {
+        background-color: #FFA500;
+      }
+
+      .timeout-btn:hover {
+        background-color: #FF8C00;
+      }
+
+      .save-btn {
+        background-color: #FFD700;
+        color: black;
+      }
+
+      .save-btn:hover {
+        background-color: #FFC107;
+      }
+
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .popup-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        width: 300px;
+        text-align: center;
+      }
+
+      /* Align back button and title on the same line */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Back button and title on the same line -->
+      <div class="header">
+        <a href="{{ url_for('admin_dashboard') }}" class="back-btn">Back</a>
+        <h1 style="margin: 0;">Users Panel</h1>
+      </div>
+
+      <div id="notification" class="notification"></div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>UserID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Number</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Timeout Countdown</th>
+            <th>Created At</th>
+            <th>Actions</th>
+            <th>Save</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr id="user-{{ user.UserID }}">
+            <td>{{ user.UserID }}</td>
+            <td>{{ user.FirstName }}</td>
+            <td>{{ user.LastName }}</td>
+            <td>{{ user.Username }}</td>
+            <td>{{ user.Email }}</td>
+            <td>{{ user.Number }}</td>
+            <td>{{ user.Role.capitalize() }}</td> <!-- Role capitalized -->
+            <td>{{ user.status.title() }}</td> <!-- Status title-cased -->
+            <td id="timeout-{{ user.UserID }}">
+              {% if user.status == 'time out' and user.timeout_until %}
+              <script>
+                startTimeoutCountdown({{ user.UserID }}, new Date("{{ user.timeout_until.isoformat() }}"));
+              </script>
+              {% endif %}
+            </td>
+            <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>
+              {% if user.Role != 'admin' %}
+              {% if user.status == 'banned' %}
+              <button class="unban-btn" onclick="unbanUser({{ user.UserID }})">Unban</button>
+              {% else %}
+              <button class="ban-btn" onclick="banUser({{ user.UserID }})">Ban</button>
+              {% if user.Role != 'moderator' %}
+              <button class="promote-btn" onclick="promoteUser({{ user.UserID }})">Promote to Moderator</button>
+              {% elif user.Role == 'moderator' %}
+              <button onclick="revertUser({{ user.UserID }})">Revert to User</button>
+              {% endif %}
+              {% if user.status == 'active' %}
+              <button class="timeout-btn" onclick="openTimeoutPopup({{ user.UserID }})">Time Out</button>
+              {% elif user.status == 'time out' %}
+              <button class="timeout-btn" onclick="removeTimeout({{ user.UserID }})">Remove Time Out</button>
+              {% endif %}
+              {% endif %}
+              {% endif %}
+            </td>
+            <td>
+              {% if user.Role != 'admin' %}
+              <button id="save-btn-{{ user.UserID }}" class="save-btn" onclick="saveChanges({{ user.UserID }})" disabled>Save</button>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay">
+      <div class="popup-content">
+        <h3>Set Timeout Duration</h3>
+        <p>Minimum: 5 minutes</p>
+        <input type="number" id="timeoutInput" value="5" min="5" step="10" /> minutes <br />
+        <button onclick="confirmTimeout()">Confirm</button>
+        <button onclick="closePopup()">Cancel</button>
+      </div>
+    </div>
+
+    <script>
+      let currentUserID = null;
+      let stagedActions = {};
+
+      function showNotification(message, isError = false) {
+        const notification = document.getElementById('notification');
+        notification.innerText = message;
+        notification.className = 'notification show ' + (isError ? 'error' : '');
+        setTimeout(() => {
+          notification.className = 'notification';
+        }, 4000);
+      }
+
+      function startTimeoutCountdown(userId, timeoutUntil) {
+        const timeoutElement = document.getElementById(`timeout-${userId}`);
+        if (!timeoutElement) return;
+
+        const timeoutDate = new Date(timeoutUntil);
+
+        function updateCountdown() {
+          const now = new Date();
+          const distance = timeoutDate - now;
+
+          if (distance > 0) {
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            let countdownText = `${minutes}m ${seconds}s`;
+            if (hours > 0) {
+              countdownText = `${hours}h ` + countdownText;
+            }
+
+            timeoutElement.innerHTML = countdownText;
+            setTimeout(updateCountdown, 1000);
+          } else {
+            timeoutElement.innerHTML = 'Timeout expired';
+          }
+        }
+
+        updateCountdown();
+      }
+
+      function openTimeoutPopup(userId) {
+        currentUserID = userId;
+        document.getElementById('popupOverlay').style.display = 'flex';
+      }
+
+      function closePopup() {
+        document.getElementById('popupOverlay').style.display = 'none';
+        currentUserID = null;
+      }
+
+      function confirmTimeout() {
+        const timeoutMinutes = parseInt(document.getElementById('timeoutInput').value);
+        if (timeoutMinutes >= 5) {
+          stagedActions[currentUserID] = { action: 'timeout', minutes: timeoutMinutes };
+          document.getElementById(`save-btn-${currentUserID}`).disabled = false;
+          closePopup();
+        } else {
+          showNotification('Timeout must be at least 5 minutes.', true);
+        }
+      }
+
+      function removeTimeout(userId) {
+        stagedActions[userId] = { action: 'remove_timeout' };
+        document.getElementById(`save-btn-${userId}`).disabled = false;
+      }
+
+      function banUser(userId) {
+        stagedActions[userId] = { action: 'ban' };
+        document.getElementById(`save-btn-${userId}`).disabled = false;
+      }
+
+      function unbanUser(userId) {
+        stagedActions[userId] = { action: 'unban' };
+        document.getElementById(`save-btn-${userId}`).disabled = false;
+      }
+
+      function promoteUser(userId) {
+        stagedActions[userId] = { action: 'promote' };
+        document.getElementById(`save-btn-${userId}`).disabled = false;
+      }
+
+      function revertUser(userId) {
+        stagedActions[userId] = { action: 'revert' };
+        document.getElementById(`save-btn-${userId}`).disabled = false;
+      }
+
+      function saveChanges(userId) {
+        if (!stagedActions[userId]) return;
+
+        const actionData = stagedActions[userId];
+        let url;
+
+        if (actionData.action === 'timeout') {
+          url = `/admin/users/timeout/${userId}?minutes=${actionData.minutes}`;
+        } else if (actionData.action === 'remove_timeout') {
+          url = `/admin/users/remove_timeout/${userId}`;
+        } else if (actionData.action === 'ban') {
+          url = `/admin/users/ban/${userId}`;
+        } else if (actionData.action === 'unban') {
+          url = `/admin/users/unban/${userId}`;
+        } else if (actionData.action === 'promote') {
+          url = `/admin/users/promote/${userId}`;
+        } else if (actionData.action === 'revert') {
+          url = `/admin/users/revert/${userId}`;
+        }
+
+        fetch(url, {
+          method: 'POST',
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            showNotification(`The user has been ${actionData.action.replace('_', ' ')} successfully.`);
+            location.reload();
+          } else {
+            showNotification('Failed to save changes.', true);
+          }
+        })
+        .catch((error) => showNotification('An error occurred.', true));
+
+        delete stagedActions[userId];
+      }
+    </script>
+  </body>
+</html>

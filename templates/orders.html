@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Orders</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #edf6f9;
+        color: #ff0000; /* Bright red text color */
+        padding-top: 80px; /* Adjusted for fixed header */
+      }
+
+      header {
+        background-color: #000;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+      }
+
+      header img {
+        height: 60px;
+        filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(93deg)
+          brightness(105%) contrast(104%);
+        margin-right: 20px; /* Space between logo and back button */
+      }
+
+      .navigation {
+        display: flex;
+        gap: 15px;
+      }
+
+      .navigation a,
+      .navigation button {
+        text-decoration: none;
+        font-weight: 500;
+        padding: 10px 15px;
+        color: #ff0000; /* Bright red text color */
+      }
+
+      .navigation button {
+        width: 120px;
+        height: 50px;
+        background: transparent;
+        border: 2px solid #ff0000; /* Bright red border color */
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 1.1em;
+        color: #ff0000; /* Bright red text color */
+        transition: color 0.3s ease, background-color 0.3s ease;
+      }
+
+      .navigation button:hover,
+      .navigation a:hover {
+        color: #fff;
+        background-color: #ff0000; /* Bright red background on hover */
+      }
+
+      .container {
+        padding: 100px 20px 20px; /* Adjusted padding for fixed header */
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #ff0000; /* Bright red text color */
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 auto;
+        background-color: #1c1c1c;
+        color: #ff0000; /* Bright red text color */
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border: 1px solid #333;
+      }
+
+      th {
+        background-color: #333;
+      }
+
+      tr:nth-child(even) {
+        background-color: #2a2a2a;
+      }
+
+      tr:hover {
+        background-color: #444; /* Slight hover effect on table rows */
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <img
+        src="https://logos-world.net/wp-content/uploads/2020/07/Asus-Logo.png"
+        alt="Logo"
+      />
+      <nav class="navigation">
+        <a href="{{ url_for('main.menu') }}">Home</a>
+        <a href="{{ url_for('user.profile') }}">Profile</a>
+        <a href="{{ url_for('main.get_cart') }}">Cart</a>
+        <a href="{{ url_for('main.products') }}">Products</a>
+        <a href="{{ url_for('main.orders') }}">My Orders</a>
+        <a href="{{ url_for('main.faq') }}">FAQ's</a>
+        <a href="{{ url_for('main.contact') }}">Contacts</a>
+        {% if role == 'admin' %}
+        <a href="{{ url_for('inventory') }}">Inventory</a>
+        <a href="{{ url_for('sales_page') }}">Sales</a>
+        {% endif %}
+        <form action="{{ url_for('user.logout') }}" method="post">
+          <button type="submit">Sign Out</button>
+        </form>
+      </nav>
+    </header>
+    <div class="container">
+      <h1>Your Orders</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            {% if role == 'admin' %}
+            <th>Username</th>
+            {% endif %}
+            <th>Sale ID</th>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Order Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if orders %} {% for order in orders %}
+          <tr>
+            <td>{{ order.order_id }}</td>
+            {% if role == 'admin' %}
+            <td>{{ order.username }}</td>
+            {% endif %}
+            <td>{{ order.sale_id }}</td>
+            <td>{{ order.product_name }}</td>
+            <td>${{ order.price }}</td>
+            <td>{{ order.created_at }}</td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
+            <td colspan="{{ 4 + (1 if role == 'admin' else 0) }}">
+              No orders found.
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

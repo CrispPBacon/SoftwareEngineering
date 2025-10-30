@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #87CEEB;
+            color: #ffffff;
+            padding-top: 80px;
+            overflow-x: hidden;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            z-index: 99;
+            background: #000;
+        }
+
+        .logo img {
+            filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(93deg) brightness(105%) contrast(104%);
+            height: 60px;
+        }
+
+        .navigation {
+            margin-left: auto;
+            display: flex;
+            gap: 15px;
+        }
+
+        .navigation a, .navigation button {
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 15px;
+            color: #ff0000;
+        }
+
+        .navigation button {
+            width: 120px;
+            height: 50px;
+            background: transparent;
+            border: 2px solid #ff0000;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1em;
+            color: #ff0000;
+        }
+
+        .navigation button:hover, .navigation a:hover {
+            color: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 20px;
+        }
+        img {
+              display: block; /* Ensures the image behaves as a block-level element */
+              margin-left: auto;
+              margin-right: auto;
+              width: 50%;
+}
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #000;
+        }
+
+        .form-group input, .form-group select {
+            width: 97%;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #ffff;
+            color: #000;
+            font-size: 16px;
+        }
+
+        .form-group input[type="submit"] {
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .form-group input[type="submit"]:hover {
+            background-color: darkred;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .navigation a, .navigation button {
+                font-size: 0.9em;
+                padding: 5px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-group input, .form-group select {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="https://logos-world.net/wp-content/uploads/2020/07/Asus-Logo.png" alt="Logo">
+        </div>
+        <nav class="navigation">
+            <a href="{{ url_for('main.menu') }}">Home</a>
+            <a href="{{ url_for('user.profile') }}">Profile</a>
+            {% if session.get('role') != 'admin' %}
+                <a href="{{ url_for('main.get_cart') }}">Cart</a>
+                <a href="{{ url_for('main.products') }}">Products</a>
+                <a href="{{ url_for('main.orders') }}">My Orders</a>
+                <a href="{{ url_for('main.faq') }}">FAQ's</a>
+                <a href="{{ url_for('main.contact') }}">Contacts</a>
+            {% endif %}
+            {% if session.get('role') == 'admin' %}
+                <a href="{{ url_for('admin.admin_users') }}">Users</a>
+                <a href="{{ url_for('admin.showcase') }}">Showcase</a>
+                <a href="{{ url_for('admin.inventory') }}">Inventory</a>
+                <a href="{{ url_for('admin.sales_page') }}">Sales</a>
+                <a href="{{ url_for('admin.analytics') }}">Analytics</a>
+            {% endif %}
+            <form action="{{ url_for('user.logout') }}" method="post">
+                <button type="submit">Sign Out</button>
+            </form>
+        </nav>
+    </header>
+    <main class="container">
+        <h2>Edit Profile</h2>
+        <img src="https://media.tenor.com/blwK0rdIId8AAAAj/cat-oiiaoiia-cat.gif" alt="CAT" style="width:110px;height:110px;">
+
+        <form method="POST" action="{{ url_for('user.profile') }}">
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" required>
+                    <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+                    <option value="LGBT+" {% if user.gender == 'LGBT+' %}selected{% endif %}>LGBT+</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" required>
+            </div>
+            <div class="form-group">
+                <label for="number">Phone Number</label>
+                <input type="text" id="number" name="number" value="{{ user.phone_number }}" required>
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" value="{{ user.username }}" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Enter Password</label>
+                <input type="password" id="current_password" name="current_password" placeholder=" ">
+            </div>
+            <div class="form-group">
+                <label for="password">New Password</label>
+                <input type="password" id="password" name="password" placeholder=" ">
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Update Profile">
+            </div>
+        </form>
+    </main>
+</body>
+</html>

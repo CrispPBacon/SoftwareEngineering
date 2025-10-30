@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 80%;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+      /* Flexbox container for heading and logout button */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      h1 {
+        color: #333;
+        margin: 0;
+        flex-grow: 1;
+        text-align: center;
+      }
+      .logout-btn {
+        background-color: #f44336;
+        padding: 10px 20px;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .logout-btn:hover {
+        background-color: #d32f2f;
+      }
+      .stats {
+        margin: 20px 0;
+        text-align: center;
+      }
+      .stats div {
+        display: inline-block;
+        margin: 0 20px;
+        font-size: 18px;
+        color: #555;
+      }
+      /* Flex container for buttons to centralize them */
+      .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Flexbox for Header (Admin Dashboard + Logout) -->
+      <div class="header">
+        <button
+          class="logout-btn"
+          onclick="window.location.href='{{ url_for('user.logout') }}'"
+        >
+          Logout
+        </button>
+        <h1>Admin Dashboard</h1>
+      </div>
+
+      <div class="stats">
+        <div>Total Users: {{ users_count }}</div>
+        <div>Total Products: {{ product_count }}</div>
+        <div>Total Sales: {{ sales_count }}</div>
+      </div>
+
+      <!-- Centralized Button Container -->
+      <div class="button-container">
+        <button onclick="window.location.href='{{ url_for('users_panel') }}'">
+          Manage Users
+        </button>
+        <button
+          onclick="window.location.href='{{ url_for('add_product_panel') }}'"
+        >
+          Add Products
+        </button>
+        <button
+          onclick="window.location.href='{{ url_for('analytics_panel') }}'"
+        >
+          View Analytics
+        </button>
+        <button onclick="window.location.href='{{ url_for('sales_panel') }}'">
+          View Sales
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-image: url("https://dlcdnrog.asus.com/rog/media/1513882457293.webp");
+            background-size: cover;
+            background-position: center;
+            color: #ff0000;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #ff0000;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="password"] {
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .password-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .toggle-password img {
+            width: 20px;
+            height: 20px;
+        }
+
+        button {
+            font-family: inherit;
+            border: none;
+            cursor: pointer;
+        }
+
+        button[type="submit"]{
+            padding: 10px;
+            font-size: 1em;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px auto;
+            display:block;
+            width:100%
+        }
+
+        button:hover {
+            background-color: #b80f0a;
+        }
+
+        .sign-up-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .sign-up-link a {
+            color: #ff0000;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sign-up-link a:hover {
+            text-decoration: underline;
+        }
+
+        .flashes {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .flashes li {
+            color: #ff0000;
+            font-weight: 500;
+        }
+
+        .flashes li.success {
+            color: green;
+        }
+
+        forgotpass {
+            color:white;
+        }
+
+    </style>
+</head>
+<body>
+    <h2>Login</h2>
+    <div class="container">
+        <form method="post" action="/login">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" required>
+
+        <label for="password">Password:</label>
+        <div class="password-container">
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <button type="button" class="toggle-password" onclick="togglePassword()">
+                <img src="https://img.icons8.com/material-outlined/24/ff0000/visible.png" alt="Toggle Password" id="eye-icon">
+            </button>
+        </div>
+        <a href="/forgot-password" class="forgotpass">Forgot password?</a></p>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="sign-up-link">
+        <p>Don't have an account? <a href="/register">Sign Up</a></p>
+    </div>
+    </div>
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.src = 'https://img.icons8.com/material-outlined/24/00ff00/invisible.png'; // Eye with line through it
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.src = 'https://img.icons8.com/material-outlined/24/ff0000/visible.png'; // Eye icon
+            }
+        }
+    </script>
+</body>
+</html>

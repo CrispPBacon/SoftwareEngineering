@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        background-color: #0e0e0e;
+        color: #ffffff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .container {
+        margin-top: 30px;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 400px;
+        width: 100%;
+      }
+
+      .card-header {
+        background-color: #b80f0a;
+        color: black;
+      }
+
+      .back-button {
+        display: inline-block;
+        padding: 10px 20px;
+        text-align: center;
+        background-color: #000; /* Black background */
+        color: red; /* Static red text */
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+        margin-bottom: 20px;
+      }
+
+      .back-button:hover {
+        color: #ff0000; /* Bright red text color on hover (optional) */
+      }
+
+      .header-container {
+        margin-top: 20px;
+      }
+
+      h1 {
+        margin: 0;
+        text-align: center;
+      }
+
+      /* Added styles for list items to ensure visibility */
+      .list-group-item {
+        color: black; /* Change the text color of list items to black */
+      }
+
+      .scrollable-container {
+        max-height: 200px; /* Limit height to enable scrolling */
+        overflow-y: auto;  /* Enable vertical scrolling */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-container">
+        <a href="/menu" class="back-button">Back to Menu</a>
+        <h1>Analytics Dashboard</h1>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">Gender Distribution</div>
+            <div class="card-body">
+              <canvas id="genderChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">Frequent Buyers</div>
+            <div class="card-body scrollable-container">
+              <ul id="frequentBuyers" class="list-group"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">Frequently Bought Items</div>
+            <div class="card-body scrollable-container">
+              <ul id="frequentItems" class="list-group"></ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">Most Spent by Users</div>
+            <div class="card-body scrollable-container">
+              <ul id="spendingStats" class="list-group"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card mb-4">
+            <div class="card-header">Frequently Bought Items by Category</div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Initialize chart instances
+      let genderChart, categoryChart;
+
+      function updateGenderChart(data) {
+        const ctx = document.getElementById('genderChart').getContext('2d');
+        if (genderChart) {
+          genderChart.data.labels = Object.keys(data);
+          genderChart.data.datasets[0].data = Object.values(data);
+          genderChart.update();
+        } else {
+          genderChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+              labels: Object.keys(data),
+              datasets: [{
+                data: Object.values(data),
+                backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe'],
+              }]
+            },
+            options: {
+              title: {
+                display: true,
+                text: 'Gender Distribution',
+              }
+            }
+          });
+        }
+      }
+
+      function updateFrequentBuyers(data) {
+        const frequentBuyersList = $('#frequentBuyers');
+        frequentBuyersList.empty();
+        if (data.length === 0) {
+          frequentBuyersList.append(`
+            <li class="list-group-item">No frequent buyers found.</li>`);
+          console.warn("No frequent buyers data available.");
+        } else {
+          data.forEach(buyer => {
+            frequentBuyersList.append(`
+            <li class="list-group-item">${buyer.username}: ${buyer.count} purchases</li>`);
+          });
+        }
+      }
+
+      function updateFrequentItems(data) {
+        const frequentItemsList = $('#frequentItems');
+        frequentItemsList.empty();
+        if (data.length === 0) {
+          frequentItemsList.append(`
+            <li class="list-group-item">No frequently bought items found.</li>`);
+          console.warn("No frequent items data available.");
+        } else {
+          data.forEach(item => {
+            frequentItemsList.append(`
+            <li class="list-group-item">${item.product_name}: ${item.count} times bought</li>`);
+          });
+        }
+      }
+
+      function updateSpendingStats(data) {
+        const spendingStatsList = $('#spendingStats');
+        spendingStatsList.empty();
+        if (data.length === 0) {
+          spendingStatsList.append(`
+            <li class="list-group-item">No spending stats available.</li>`);
+          console.warn("No spending stats data available.");
+        } else {
+          data.forEach(stat => {
+            spendingStatsList.append(`
+            <li class="list-group-item">${stat.username}: $${stat.total_spent.toFixed(2)}</li>`);
+          });
+        }
+      }
+
+      function updateCategoryChart(data) {
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+        if (categoryChart) {
+          categoryChart.data.labels = Object.keys(data);
+          categoryChart.data.datasets[0].data = Object.values(data);
+          categoryChart.update();
+        } else {
+          categoryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: Object.keys(data),
+              datasets: [{
+                data: Object.values(data),
+                backgroundColor: Object.keys(data).map(() => `#${Math.floor(Math.random() * 16777215).toString(16)}`),
+              }]
+            },
+            options: {
+              title: {
+                display: true,
+                text: 'Frequently Bought Items by Category',
+              },
+              scales: {
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: true,
+                  },
+                }]
+              }
+            }
+          });
+        }
+      }
+      $(document).ready(function() {
+        function updateAnalytics() {
+          $.getJSON('/analytics/data', function(data) {
+            console.log(data); // Add this line to inspect the returned data
+            updateGenderChart(data.gender_percentage);
+            updateFrequentBuyers(data.frequent_buyers);
+            updateFrequentItems(data.frequent_items);
+            updateSpendingStats(data.spending_stats);
+            updateCategoryChart(data.category_data);
+          }).fail(function() {
+            console.error("Failed to fetch analytics data.");
+          });
+        }
+        // Fetch analytics data on page load and refresh every 2 seconds
+        updateAnalytics();
+        setInterval(updateAnalytics, 2000);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Users</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #0e0e0e;
+        color: #ff0000;
+        padding: 20px;
+      }
+
+      h2 {
+        text-align: center;
+        color: #ff0000;
+      }
+
+      .table-container {
+        width: 100%;
+        max-height: 400px; /* Set a fixed height for the table container */
+        overflow-y: auto; /* Enable vertical scrolling */
+        margin: 20px 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #ff0000;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid #333;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #1c1c1c;
+      }
+
+      td {
+        background-color: #2a2a2a;
+      }
+
+      tr:hover {
+        background-color: #444;
+      }
+
+      .back-button {
+        display: block;
+        margin: 20px 0;
+        padding: 10px 15px;
+        background-color: #ff0000;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        width: 100px;
+      }
+
+      .back-button:hover {
+        background-color: #ff4444;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>All Users</h2>
+
+    <!-- Back Button -->
+    <a href="{{ url_for('main.menu') }}" class="back-button">Back to Menu</a>
+
+    <!-- Scrollable Table Container -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>UserID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Gender</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>Username</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{ user.user_id }}</td>
+            <td>{{ user.first_name }}</td>
+            <td>{{ user.last_name }}</td>
+            <td>{{ user.gender }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phone_number }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.role }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

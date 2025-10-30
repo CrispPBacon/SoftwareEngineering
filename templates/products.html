@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800&display=swap');
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      body {
+        background-color: #edf6f9;
+        color: #ff0000; /* Bright red text color */
+        padding-top: 80px; /* Adjusted for fixed header */
+      }
+
+      header {
+        width: 100%;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        z-index: 99;
+        background: #000; /* Black background for header */
+        position: fixed;
+        top: 0;
+      }
+
+      header img {
+        height: 60px;
+        filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(93deg)
+          brightness(105%) contrast(104%);
+        margin-right: 20px; /* Space between logo and back button */
+      }
+
+      .navigation {
+        margin-left: auto;
+        display: flex;
+        gap: 15px;
+      }
+
+      .navigation a,
+      .navigation button {
+        text-decoration: none;
+        color: #ff0000; /* Bright red text color */
+        font-weight: 500;
+        padding: 10px 15px;
+      }
+
+      .navigation button {
+        width: 120px;
+        height: 50px;
+        background: transparent;
+        border: 2px solid #ff0000; /* Bright red border color */
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 1.1em;
+        color: #ff0000; /* Bright red text color */
+      }
+
+      .navigation button:hover,
+      .navigation a:hover {
+        color: #fff;
+      }
+
+      .container {
+        padding: 100px 20px 20px; /* Adjusted padding for fixed header */
+      }
+
+      h2 {
+        text-align: center;
+        color: #ff0000; /* Bright red text color */
+        margin-top: 80px; /* Adjusted for fixed header */
+      }
+
+      #searchBox {
+        display: block;
+        margin: 20px auto;
+        width: 80%;
+        max-width: 500px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ff0000;
+        border-radius: 5px;
+        background-color: #1c1c1c;
+        color: #ff0000;
+      }
+
+      .product-list {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .product-item {
+        padding: 20px;
+        border: 1px solid #333;
+        margin: 10px;
+        width: 300px;
+        text-align: center;
+        background-color: #1c1c1c;
+        color: #ff0000; /* Bright red text color */
+      }
+
+      .product-item h3 {
+        margin-bottom: 10px;
+        color: #ff0000; /* Bright red text color */
+      }
+
+      .product-item p {
+        margin-bottom: 5px;
+        color: #ff0000; /* Bright red text color */
+      }
+
+      .product-item img {
+        width: 200px;
+        height: 150px;
+        object-fit: cover;
+        margin-bottom: 10px;
+      }
+
+      .product-item button {
+        margin-right: 10px;
+        padding: 5px 10px;
+        background-color: #ff0000;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      #notification {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        border-radius: 5px;
+        z-index: 1000;
+      }
+
+      .highlight {
+        background-color: yellow;
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img
+        src="https://logos-world.net/wp-content/uploads/2020/07/Asus-Logo.png"
+        alt="Logo"
+      />
+      <nav class="navigation">
+        <a href="/menu">Home</a>
+        <a href="/profile">Profile</a>
+        <a href="/cart">Cart</a>
+        <a href="/products">Products</a>
+        <a href="/orders">My Orders</a>
+        <a href="/faq">FAQ's</a>
+        <a href="/contact">Contact</a>
+        <form action="/logout" method="post">
+          <button type="submit">Sign Out</button>
+        </form>
+      </nav>
+    </header>
+    <main>
+      <h2>Products</h2>
+
+      <!-- Search box -->
+      <input
+        type="text"
+        id="searchBox"
+        placeholder="Search products..."
+        oninput="filterProducts()"
+        onkeypress="checkEnterKey(event)"
+      />
+
+      <div class="product-list" id="productList">
+        <!-- Products will be dynamically inserted here -->
+      </div>
+      <div id="notification">Item added to cart!</div>
+    </main>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+      function fetchProducts() {
+        $.get('/getproducts', function (data) {
+          console.log('Products fetched:', data); // Log the data for debugging
+          var productList = document.getElementById('productList');
+          productList.innerHTML = '';
+          data.forEach(function (product) {
+            var productItem = `
+                        <div class="product-item" data-name="${product.product_name.toLowerCase()}">
+                            <img src="${product.image_url}" alt="${
+              product.product_name
+            }">
+                            <h3 class="product-name">${
+                              product.product_name
+                            }</h3>
+                            <p>Price: $${product.price.toFixed(2)}</p>
+                            <p>Stock: ${product.stock}</p>
+                            <button onclick="addToCart(${
+                              product.product_id
+                            })">Add to Cart</button>
+                        </div>`;
+            productList.innerHTML += productItem;
+          });
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+          console.log('Request Failed: ' + textStatus + ', ' + errorThrown);
+        });
+      }
+
+      function filterProducts() {
+        var searchInput = document
+          .getElementById('searchBox')
+          .value.toLowerCase()
+          .trim();
+        var products = document.querySelectorAll('.product-item');
+
+        products.forEach(function (product) {
+          var productName = product.getAttribute('data-name');
+          var productTitle = product.querySelector('.product-name');
+          productTitle.innerHTML = productName; // Reset to original
+
+          if (searchInput === '' || productName.includes(searchInput)) {
+            product.style.display = 'block'; // Show products that match or show all if input is empty
+
+            if (searchInput !== '' && productName.includes(searchInput)) {
+              var highlighted = productName.replace(
+                searchInput,
+                `<span class="highlight">${searchInput}</span>`
+              );
+              productTitle.innerHTML = highlighted; // Highlight matching text
+            }
+          } else {
+            product.style.display = 'none'; // Hide non-matching products
+          }
+        });
+      }
+
+      function checkEnterKey(event) {
+        if (event.key === 'Enter') {
+          filterProducts(); // Trigger search on pressing "Enter"
+        }
+      }
+
+      function addToCart(productId) {
+        $.ajax({
+          url: '/addtocart',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            product_id: productId,
+            quantity: 1, // Default quantity
+          }),
+          success: function (response) {
+            showNotification('Item added to cart');
+          },
+          error: function (response) {
+            console.log('FAILED: ', response);
+            showNotification('Failed to add item to cart');
+          },
+        });
+      }
+
+      function showNotification(message) {
+        var notification = document.getElementById('notification');
+        notification.innerText = message;
+        notification.style.display = 'block';
+        setTimeout(function () {
+          notification.style.display = 'none';
+        }, 2000);
+      }
+
+      // Initially fetch all products
+      fetchProducts();
+    </script>
+  </body>
+</html>

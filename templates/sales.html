@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Report</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <style>
+    body {
+      background-color: #0e0e0e;
+      color: #fff;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+
+    h2 {
+      color: #ff0000;
+      font-size: 2rem;
+      text-align: center;
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .back-button {
+      padding: 10px;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #333;
+    }
+
+    .sales-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: #1c1c1c;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .sales-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .sales-table th, .sales-table td {
+      border: 1px solid #333;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .sales-table th {
+      background-color: #444;
+      color: #ff0000;
+    }
+
+    .period-selector {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .period-selector label {
+      margin-right: 10px;
+      color: #fff;
+    }
+
+    .loading, .no-data {
+      font-size: 1.2em;
+      text-align: center;
+      color: #fff;
+    }
+
+    .no-data {
+      color: #ff0000;
+    }
+
+    .shipping-info, .card-details {
+      text-align: left;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="sales-container">
+    <div class="header-container">
+      <h2>Sales Report</h2>
+      <a href="/menu" class="back-button">Back to Menu</a>
+    </div>
+    <div class="period-selector">
+      <label for="periodSelect">Select Period:</label>
+      <select id="periodSelect">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="quarterly">Quarterly</option>
+        <option value="yearly">Yearly</option>
+        <option value="all-time">All-Time</option>
+      </select>
+    </div>
+    <table class="sales-table">
+      <thead>
+        <tr>
+          <th>Sale ID</th>
+          <th>Username</th>
+          <th>Product ID</th>
+          <th>Product Name</th>
+          <th>Quantity</th>
+          <th>Total Price</th>
+          <th>Date & Time</th>
+        </tr>
+      </thead>
+      <tbody id="salesTableBody">
+        <tr>
+          <td colspan="7" class="loading">Loading sales data...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function fetchSales(period = 'daily') {
+      console.log(`Fetching sales data for period: ${period}`);
+      $('#salesTableBody').html(`
+        <tr>
+          <td colspan="7" class="loading">Loading sales data...</td>
+        </tr>
+      `);
+
+      $.get(`/getsales?period=${period}`, function(data) {
+        console.log("Sales data received:", data);
+        const salesTableBody = $('#salesTableBody');
+        salesTableBody.empty();
+
+        if (data.length === 0) {
+          salesTableBody.append(`
+            <tr>
+              <td colspan="7" class="no-data">No sales data available</td>
+            </tr>
+          `);
+          return;
+        }
+
+        // Populate the sales table with the received data
+        data.forEach(sale => {
+          const row = `
+            <tr>
+              <td>${sale.sale_id}</td>
+              <td>${sale.username}</td>
+              <td>${sale.product_id}</td>
+              <td>${sale.product_name}</td>
+              <td>${sale.quantity}</td>
+              <td>$${sale.total_price.toFixed(2)}</td>
+              <td>${new Date(sale.created_at).toLocaleString()}</td>
+            </tr>`;
+          salesTableBody.append(row);
+        });
+
+      }).fail(() => {
+        $('#salesTableBody').html(`
+          <tr>
+            <td colspan="7" class="no-data">Failed to load sales data</td>
+          </tr>
+        `);
+      });
+    }
+
+    $(document).ready(function() {
+      $('#periodSelect').on('change', function() {
+        const selectedPeriod = this.value;
+        fetchSales(selectedPeriod);
+      });
+
+      fetchSales();  // Initial fetch for the default period
+    });
+  </script>
+</body>
+</html>
