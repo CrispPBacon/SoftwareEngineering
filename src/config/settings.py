@@ -1,6 +1,8 @@
 from . import ENV, SECRET_KEY, PORT, SQLALCHEMY_DATABASE_URI, FRONTEND_URL
 from ..models import db
+
 from sqlalchemy.exc import OperationalError
+from flask_migrate import Migrate
 
 
 def load_config(app):
@@ -11,6 +13,8 @@ def load_config(app):
     app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['FRONTEND_URL'] = FRONTEND_URL
+
+    migrate = Migrate(app, db)
 
     # Initialize database
     db.init_app(app)

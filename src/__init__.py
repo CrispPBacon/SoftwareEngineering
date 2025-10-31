@@ -1,7 +1,9 @@
 from flask import Flask
+
 from .routes import main_bp, user_bp, admin_bp
 from .config import load_config, load_mail_config
 from .utils import register_error_handlers, inject_role
+from .models import db
 
 
 def create_app():

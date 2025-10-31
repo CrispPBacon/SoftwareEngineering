@@ -1,32 +1,23 @@
 from flask_mail import Message
+import uuid
+from datetime import datetime, timedelta
+
 from ..config import mail, SECRET_KEY
-from itsdangerous import URLSafeTimedSerializer
+from ..models import User, db
 
 from flask import current_app
 
 
-def send_token_to_email(recipient, token):
-    msg = Message(
-        subject='Crisppbacon Page Forget Password',
-        sender='swankymr@gmail.com',  # Ensure this matches MAIL_USERNAME
-        recipients=[f'{recipient}']  # Replace with actual recipient's email
-    )
-    msg.body = f"Forget password click here to reset your password: https://crisppbacon.pythonanywhere.com/reset/{token}"
-    mail.send(msg)
-
-
 def generate_token(email):
-    s = URLSafeTimedSerializer(SECRET_KEY)
-    return s.dumps(email, salt='password-reset-salt')
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return None
 
-
-def confirm_token(token, expiration=3600):
-    s = URLSafeTimedSerializer(SECRET_KEY)
-    try:
-        email = s.loads(token, salt='password-reset-salt', max_age=expiration)
-    except:
-        return False
-    return email
+    token = str(uuid.uuid4())  # random unique string
+    user.reset_token = token
+    user.reset_token_expires = datetime.utcnow() + timedelta(seconds=30)
+    db.session.commit()
+    return token
 
 
 def send_reset_email(to_email, token):

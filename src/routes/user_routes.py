@@ -1,7 +1,10 @@
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, request, flash, session, render_template, redirect, url_for, jsonify
+from datetime import datetime
+
+
 from ..models import User, db
-from ..services import send_token_to_email, generate_token, confirm_token, send_reset_email
+from ..services import generate_token, send_reset_email
 
 user_bp = Blueprint('user', __name__)
 
@@ -199,17 +202,21 @@ def forgot_password():
 
 @user_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
-    email = confirm_token(token)
-    if not email:
+    user = User.query.filter_by(reset_token=token).first()
+
+    if not user or user.reset_token_expires < datetime.utcnow():
         flash('The reset link is invalid or has expired.', 'danger')
         return redirect(url_for('user.forgot_password'))
 
     if request.method == 'POST':
         password = request.form['password']
-        user = User.query.filter_by(email=email).first()
-        if user:
-            user.set_password(password)
-            db.session.commit()
-            flash('Your password has been updated.', 'success')
-            return redirect(url_for('user.login'))
+        user.set_password(password)
+        # Invalidate the token after use
+        user.reset_token = None
+        user.reset_token_expires = None
+        db.session.commit()
+
+        flash('Your password has been updated.', 'success')
+        return redirect(url_for('user.login'))
+
     return render_template('reset_password.html')
