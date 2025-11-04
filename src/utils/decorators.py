@@ -6,7 +6,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            flash('You need to log in first.', 'error')
+            flash('You need to log in first.', 'bg-red-300 text-red-700')
             return redirect(url_for('user.login'))
         if session.get('role') != 'admin':
             # flash('You do not have permission to access this page.', 'error')
@@ -22,7 +22,7 @@ def user_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            flash('You need to log in first.', 'error')
+            flash('You need to log in first.', 'bg-red-300 text-red-700')
             return redirect(url_for('user.login'))
         if session.get('role') == 'admin':
             # flash('Admins cannot access user-only areas.', 'error')

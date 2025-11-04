@@ -21,7 +21,7 @@ def menu():
         images = ShowcaseImage.query.all()
         return render_template('menu.html', images=images)
     except Exception as e:
-        flash(f"Error loading menu: {str(e)}", "error")
+        flash(f"Error loading menu: {str(e)}", 'bg-red-300 text-red-700')
         return redirect(url_for("user.login"))
 
 
@@ -34,7 +34,8 @@ def products():
         return render_template('products.html', products=products)
     except Exception as e:
         print(f'Error loading products: {str(e)}')
-        flash('An error occurred while trying to fetch products.', 'error')
+        flash('An error occurred while trying to fetch products.',
+              'bg-red-300 text-red-700')
         return redirect(url_for('main.menu'))  # Redirect to a sensible default
 
 
@@ -72,7 +73,8 @@ def orders():
     except Exception as e:
         print(
             f'An error occurred while fetching orders: {str(e)}')
-        flash(f'An error occurred while fetching orders: {str(e)}', 'error')
+        flash(
+            f'An error occurred while fetching orders: {str(e)}', 'bg-red-300 text-red-700')
         return redirect(url_for('main.menu'))
 
 
@@ -100,7 +102,8 @@ def get_cart():
         return render_template('cart.html', cart_items=cart_list, subtotal=subtotal)
     except Exception as e:
         print(f"Failed to load cart: {str(e)}")
-        flash("Failed to load cart. Please try again later.", "error")
+        flash("Failed to load cart. Please try again later.",
+              'bg-red-300 text-red-700')
         return redirect(url_for('main.menu'))
 
 

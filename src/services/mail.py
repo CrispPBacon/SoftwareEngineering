@@ -15,7 +15,7 @@ def generate_token(email):
 
     token = str(uuid.uuid4())  # random unique string
     user.reset_token = token
-    user.reset_token_expires = datetime.utcnow() + timedelta(seconds=30)
+    user.reset_token_expires = datetime.utcnow() + timedelta(minutes=30)
     db.session.commit()
     return token
 

@@ -23,12 +23,13 @@ def admin_users():
     try:
         users = User.query.all()
         if not users:
-            flash("No users found.", "info")
+            flash("No users found.", 'bg-blue-300 text-blue-700')
             return render_template('users.html', users=[])
         return render_template('users.html', users=users)
     except Exception as e:
         print(f"Error fetching users: {str(e)}")
-        flash('An error occurred while fetching users.', 'error')
+        flash('An error occurred while fetching users.',
+              'bg-red-300 text-red-700')
         return redirect(url_for('admin.admin_dashboard'))
 
 
@@ -157,7 +158,8 @@ def sales_page():
         return render_template('sales.html', sales=sales_list)
     except Exception as e:
         print(f'Error fetching daily sales data: {str(e)}')
-        flash('Unable to load sales data. Please try again.', 'error')
+        flash('Unable to load sales data. Please try again.',
+              'bg-red-300 text-red-700')
         return redirect(url_for('admin.admin_dashboard'))
 
 
@@ -389,6 +391,6 @@ def admin_user_info():
         # Log the error
         print(f"Error loading user info: {e}", exc_info=True)
         flash("Failed to load user information.",
-              "error")  # Flash error message
+              'bg-red-300 text-red-700')  # Flash error message
         # Redirect if there's an error
         return redirect(url_for('admin.admin_dashboard'))

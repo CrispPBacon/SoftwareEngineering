@@ -8,7 +8,8 @@ from .models import db
 
 def create_app():
     # Initialization
-    app = Flask(__name__, template_folder="../templates")
+    app = Flask(__name__, static_folder="../static",
+                template_folder="../templates")
     load_config(app)
     load_mail_config(app)
 

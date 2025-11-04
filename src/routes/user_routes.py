@@ -25,11 +25,13 @@ def login():
                     f'Login successful for user: {username}, role: {user.role}')
                 return redirect(url_for('main.menu'))
             else:
-                flash('Invalid username or password', 'error')
+                flash('Invalid username or password',
+                      'bg-red-300 text-red-700')
                 print(
                     f'Invalid username or password for user: {username}')
         except Exception as e:
-            flash(f'An error occurred during login: {str(e)}', 'error')
+            flash(
+                f'An error occurred during login: {str(e)}', 'bg-red-300 text-red-700')
             print(f'Error during login: {str(e)}')
     return render_template('login.html')
 
@@ -43,6 +45,7 @@ def register():
             last_name = request.form.get('last_name', '').strip()
             gender = request.form.get('gender', '').strip()
             email = request.form.get('email', '').strip()
+            numPrefix = request.form.get('numPrefix', '').strip()
             number = request.form.get('number', '').strip()
             username = request.form.get('username', '').strip()
             password = request.form.get('password', '').strip()
@@ -67,7 +70,7 @@ def register():
             # Display errors and reload the form if there are any
             if errors:
                 for error in errors:
-                    flash(error, 'error')
+                    flash(error, 'bg-red-300 text-red-700')
                 return render_template('register.html')
 
             # Create new user
@@ -76,7 +79,7 @@ def register():
                 last_name=last_name,
                 gender=gender,
                 email=email,
-                phone_number=number,
+                phone_number=numPrefix+number,
                 username=username,
                 role='user'
             )
@@ -85,7 +88,8 @@ def register():
             # Save to the database
             db.session.add(new_user)
             db.session.commit()
-            flash('Registration successful! Please log in.', 'success')
+            flash('Registration successful! Please log in.',
+                  'bg-green-300 text-green-700')
             return redirect(url_for('user.login'))
 
         except IntegrityError as e:
@@ -93,15 +97,19 @@ def register():
             print(
                 f"Integrity error during registration: {str(e)}")
             if 'username' in str(e.orig).lower():
-                flash('Username is already taken. Please try another.', 'error')
+                flash('Username is already taken. Please try another.',
+                      'bg-red-300 text-red-700')
             elif 'email' in str(e.orig).lower():
-                flash('Email is already registered. Please use another.', 'error')
+                flash('Email is already registered. Please use another.',
+                      'bg-red-300 text-red-700')
             else:
-                flash('An integrity error occurred. Please try again.', 'error')
+                flash('An integrity error occurred. Please try again.',
+                      'bg-red-300 text-red-700')
         except Exception as e:
             print(
                 f"Unexpected error during registration: {str(e)}")
-            flash('An unexpected error occurred. Please try again.', 'error')
+            flash('An unexpected error occurred. Please try again.',
+                  'bg-red-300 text-red-700')
 
     return render_template('register.html')
 
@@ -110,12 +118,12 @@ def register():
 def profile():
     # Ensure the user is logged in
     if 'user_id' not in session:
-        flash('You need to log in first.', 'error')
+        flash('You need to log in first.', 'bg-red-300 text-red-700')
         return redirect(url_for('user.login'))
     # Retrieve the logged-in user's data
     user = User.query.get(session['user_id'])
     if not user:
-        flash('User not found.', 'error')
+        flash('User not found.', 'bg-red-300 text-red-700')
         return redirect(url_for('user.login'))
     # Allow admins to access their profile
     if user.role == 'admin':
@@ -135,13 +143,15 @@ def profile():
             password = request.form.get('password')
             # Validate input data
             if not all([first_name, last_name, gender, email, phone_number, username]):
-                flash('All fields except password are required.', 'error')
+                flash('All fields except password are required.',
+                      'bg-red-300 text-red-700')
                 return render_template('profile.html', user=user)
             if '@' not in email:
-                flash('Invalid email address.', 'error')
+                flash('Invalid email address.', 'bg-red-300 text-red-700')
                 return render_template('profile.html', user=user)
             if not phone_number.isdigit():
-                flash('Phone number must contain only digits.', 'error')
+                flash('Phone number must contain only digits.',
+                      'bg-red-300 text-red-700')
                 return render_template('profile.html', user=user)
             # Update user details
             user.first_name = first_name
@@ -153,26 +163,31 @@ def profile():
             # Conditionally update the password if provided
             if password:
                 if len(password) < 6:
-                    flash('Password must be at least 6 characters long.', 'error')
+                    flash('Password must be at least 6 characters long.',
+                          'bg-red-300 text-red-700')
                     return render_template('profile.html', user=user)
                 if not user.check_password(current_password):
-                    flash('You entered the wrong current password!', 'error')
+                    flash('You entered the wrong current password!',
+                          'bg-red-300 text-red-700')
                     return render_template('profile.html', user=user)
                 user.set_password(password)
             # Commit changes to the database
             db.session.commit()
-            flash('Profile updated successfully!', 'success')
+            flash('Profile updated successfully!',
+                  'bg-green-300 text-green-700')
         except IntegrityError as e:
             db.session.rollback()
             if 'unique constraint' in str(e.orig).lower():
                 flash(
-                    'Username or Email already exists, please try a different one.', 'error')
+                    'Username or Email already exists, please try a different one.', 'bg-red-300 text-red-700')
             else:
-                flash(f'Error updating profile: {str(e)}', 'error')
+                flash(
+                    f'Error updating profile: {str(e)}', 'bg-red-300 text-red-700')
         except Exception as e:
             db.session.rollback()
             print(f"Error updating profile: {str(e)}")
-            flash('An unexpected error occurred. Please try again later.', 'error')
+            flash('An unexpected error occurred. Please try again later.',
+                  'bg-red-300 text-red-700')
     return render_template('profile.html', user=user)
 
 
@@ -191,9 +206,11 @@ def forgot_password():
         if user:
             token = generate_token(email)
             send_reset_email(email, token)
-            flash('Reset link sent to your email.', 'success')
+            flash('Reset link sent to your email.',
+                  'bg-green-300 text-green-700')
         else:
-            flash('No account found with that email.', 'error')
+            flash('No account found with that email.',
+                  'bg-red-300 text-red-700')
 
         return redirect(url_for("user.forgot_password"))
 
@@ -216,7 +233,7 @@ def reset_password(token):
         user.reset_token_expires = None
         db.session.commit()
 
-        flash('Your password has been updated.', 'success')
+        flash('Your password has been updated.', 'bg-green-300 text-green-700')
         return redirect(url_for('user.login'))
 
     return render_template('reset_password.html')

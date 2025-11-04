@@ -1,191 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="m-0 p-0">
+    <!-- Background container -->
+    <div
+      class="text-white relative w-full min-h-screen flex items-center justify-center bg-cover bg-center"
+      style="
+        background-image: url('static/assets/abstract-background-with-colorful-spheres-dark-background_1022970-53002.jpg');
+      "
+    >
+      <!-- Frosted overlay -->
+      <div class="absolute inset-0 bg-black/50 backdrop-blur-[25px]"></div>
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-image: url("https://dlcdnrog.asus.com/rog/media/1513882457293.webp");
-            background-size: cover;
-            background-position: center;
-            padding: 20px;
-        }
-
-        h2 {
-            margin-bottom: 20px;
-            color: #ff0000;
-            text-align: center;
-            font-size: 28px;
-        }
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 20px;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        label {
-            font-weight: 500;
-            color: #000;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #ff0000;
-            border-radius: 5px;
-            background-color: #ffffff;
-            color: #000;
-            margin-bottom: 15px;
-        }
-
-        input::placeholder, select {
-            color: #000;
-            opacity: 0.8;
-        }
-
-        button {
-            background-color: #ff0000;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        button:hover {
-            background-color: darkred;
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-            color: #ff0000;
-            font-size: 14px;
-        }
-
-        .login-link a {
-            color: #ff0000;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        .flashes {
-            list-style-type: none;
-            padding: 0;
-            margin-top: 10px;
-            text-align: center;
-        }
-
-        .flashes li {
-            color: red;
-            font-size: 14px;
-        }
-
-        .flashes li.success {
-            color: green;
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            h2 {
-                font-size: 22px;
-            }
-            .container {
-                padding: 15px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <h2>Register</h2>
-    <div class="container">
-        <form method="post" action="/register">
-            <div>
-                <label for="first_name">First Name:</label>
-                <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" required>
-            </div>
-
-            <div>
-                <label for="last_name">Last Name:</label>
-                <input type="text" id="last_name" name="last_name" placeholder="Enter your last name" required>
-            </div>
-
-            <div>
-                <label for="gender">Gender:</label>
-                <select id="gender" name="gender" required>
-                    <option value="" disabled selected>Select your gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="LGBT+">LGBT+</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required>
-            </div>
-
-            <div>
-                <label for="number">Phone Number:</label>
-                <input type="text" id="number" name="number" placeholder="Enter your phone number" required>
-            </div>
-
-            <div>
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" placeholder="Choose a username" required>
-            </div>
-
-            <div>
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" placeholder="Create a password" required>
-            </div>
-
-            <button type="submit">Register</button>
-        </form>
-
-        <div class="login-link">
-            <p>Already have an account? <a href="/login">Login</a></p>
+      <!-- Signup form -->
+      <form
+        method="post"
+        action="/register"
+        class="relative h-128 px-8 py-6 rounded-2xl w-105 bg-white/15 flex flex-col gap-4"
+      >
+        <!-- Logo and title -->
+        <img
+          src="static/assets/image.png"
+          alt="LOGO"
+          class="absolute left-0 -top-18 rounded-full h-20 mt-8 bg-white/75"
+        />
+        <div class="flex flex-col items-center">
+          <h1 class="font-bold text-4xl mt-5 text-white">Create an account</h1>
         </div>
-    </div>
 
-    <!-- Flask flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class="flashes">
+        <div class="w-full mb-1 flex gap-5">
+          <input
+            required
+            id="first_name"
+            name="first_name"
+            type="text"
+            placeholder="First Name"
+            class="w-full p-1.5 text-white outline-none border-b-2 focus:border-b-blue-300"
+          />
+          <input
+            required
+            name="last_name"
+            id="last_name"
+            type="text"
+            placeholder="Last Name"
+            class="w-full p-1.5 text-white outline-none border-b-2 focus:border-b-blue-300"
+          />
+        </div>
+        <div class="w-full mb-1 flex relative justify-between gap-5">
+          <select
+            required
+            id="gender"
+            name="gender"
+            class="w-[8rem] p-1.5 text-white outline-none border-b-2 focus:border-b-blue-300"
+          >
+            <option value="" class="text-black" disabled selected>
+              Gender
+            </option>
+            <option value="Male" class="text-black">Male</option>
+            <option value="Female" class="text-black">Female</option>
+          </select>
+          <span class="flex border-b-2 gap-1.5">
+            <select
+              id="numPrefix"
+              name="numPrefix"
+              class="w-[4rem] p-1.5 text-white outline-none"
+              required
+            >
+              <option value="63" class="text-black">+63</option>
+            </select>
+            <input
+              required
+              id="number"
+              name="number"
+              type="text"
+              placeholder="Phone Number"
+              class="outline-none"
+            />
+          </span>
+        </div>
+        <div class="w-full mb-1 flex gap-5">
+          <input
+            required
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Email"
+            class="w-full p-1.5 text-white outline-none border-b-2 focus:border-b-blue-300"
+          />
+        </div>
+        <div class="w-full mb-1 flex gap-5">
+          <input
+            required
+            id="username"
+            name="username"
+            type="text"
+            placeholder="Username"
+            class="w-full p-1.5 text-white outline-none border-b-2 focus:border-b-blue-300"
+          />
+        </div>
+        <div class="w-full flex gap-5">
+          <input
+            required
+            id="password"
+            name="password"
+            type="password"
+            placeholder="Password"
+            class="w-full p-1.5 text-white outline-none border-b-2 focus:border-b-blue-300"
+          />
+        </div>
+
+        <!-- Send button -->
+        <button
+          class="w-full mt-5 px-4 py-2 rounded-lg bg-gray-900 text-white font-medium text-center hover:bg-black transition duration-150 ease-in-out focus:ring-4 focus:ring-gray-500"
+        >
+          Signup
+        </button>
+        <p class="text-center">
+          Already have an account?
+          <a href="/login" class="font-medium">Login</a>
+        </p>
+      </form>
+
+      <!-- TOAST NOTIF -->
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <ul
+        class="flashes flex absolute top-0 w-full left-0 px-50 justify-center"
+      >
         {% for category, message in messages %}
-          <li class="{{ category }}">{{ message }}</li>
+        <li class="p-2 text-center rounded-b-2xl {{ category }}">
+          {{ message }}
+        </li>
         {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-</body>
+      </ul>
+      {% endif %} {% endwith %}
+    </div>
+  </body>
 </html>
